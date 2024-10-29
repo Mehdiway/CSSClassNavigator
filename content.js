@@ -2,17 +2,22 @@ class DiffNavigator {
   constructor() {
     this.highlightedElements = [];
     this.currentIndex = -1;
-    this.findHighlightedElements();
+    this.currentClass = '';
   }
 
-  findHighlightedElements() {
-    this.highlightedElements = Array.from(
-      document.getElementsByClassName('diff-html-added')
-    );
+  findHighlightedElements(className) {
+    if (!className) {
+      this.highlightedElements = [];
+      this.currentIndex = -1;
+      return;
+    }
 
-    // If there are highlighted elements and we haven't selected one yet, start at the first
-    if (this.highlightedElements.length > 0 && this.currentIndex === -1) {
-      this.currentIndex = 0;
+    if (className !== this.currentClass) {
+      this.currentClass = className;
+      this.highlightedElements = Array.from(
+        document.getElementsByClassName(className)
+      );
+      this.currentIndex = this.highlightedElements.length > 0 ? 0 : -1;
     }
   }
 
@@ -32,29 +37,31 @@ class DiffNavigator {
     }, 1000);
   }
 
-  navigateToNext() {
-    if (this.highlightedElements.length === 0) return;
+  navigateToNext(className) {
+    this.findHighlightedElements(className);
+    if (this.highlightedElements.length === 0) return null;
 
     this.currentIndex =
       (this.currentIndex + 1) % this.highlightedElements.length;
     this.scrollToElement(this.highlightedElements[this.currentIndex]);
-    return {
-      current: this.currentIndex,
-      total: this.highlightedElements.length,
-    };
+    return this.getState();
   }
 
-  navigateToPrevious() {
-    if (this.highlightedElements.length === 0) return;
+  navigateToPrevious(className) {
+    this.findHighlightedElements(className);
+    if (this.highlightedElements.length === 0) return null;
 
     this.currentIndex =
       (this.currentIndex - 1 + this.highlightedElements.length) %
       this.highlightedElements.length;
     this.scrollToElement(this.highlightedElements[this.currentIndex]);
-    return {
-      current: this.currentIndex,
-      total: this.highlightedElements.length,
-    };
+    return this.getState();
+  }
+
+  reset(className) {
+    this.currentClass = '';
+    this.findHighlightedElements(className);
+    return this.getState();
   }
 
   getState() {
@@ -72,13 +79,17 @@ const navigator = new DiffNavigator();
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.action) {
     case 'next':
-      sendResponse(navigator.navigateToNext());
+      sendResponse(navigator.navigateToNext(request.className));
       break;
     case 'previous':
-      sendResponse(navigator.navigateToPrevious());
+      sendResponse(navigator.navigateToPrevious(request.className));
       break;
     case 'getCount':
+      navigator.findHighlightedElements(request.className);
       sendResponse(navigator.getState());
+      break;
+    case 'reset':
+      sendResponse(navigator.reset(request.className));
       break;
   }
   return true;

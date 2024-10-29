@@ -3,16 +3,29 @@
   <head>
     <style>
       body {
-        width: 200px;
-        padding: 10px;
+        width: 250px;
+        padding: 15px;
         font-family: Arial, sans-serif;
       }
 
-      .container {
+      .input-container {
+        margin-bottom: 15px;
+      }
+
+      .input-container input {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+
+      .navigation-container {
         display: flex;
         align-items: center;
         gap: 10px;
         justify-content: center;
+        margin-top: 10px;
       }
 
       button {
@@ -35,21 +48,31 @@
 
       #counter {
         font-size: 14px;
+        min-width: 40px;
+        text-align: center;
       }
 
       .no-highlights {
         text-align: center;
         color: #666;
+        margin-top: 10px;
       }
     </style>
   </head>
   <body>
-    <div id="content">
-      <div class="container">
-        <button id="prevButton">Prev</button>
-        <span id="counter">0/0</span>
-        <button id="nextButton">Next</button>
-      </div>
+    <div class="input-container">
+      <label for="classInput">Target class name:</label>
+      <input
+        type="text"
+        id="classInput"
+        placeholder="Enter class name..."
+        value="diff-html-added"
+      />
+    </div>
+    <div class="navigation-container">
+      <button id="prevButton">Prev</button>
+      <span id="counter">0/0</span>
+      <button id="nextButton">Next</button>
     </div>
     <script src="popup.js"></script>
   </body>

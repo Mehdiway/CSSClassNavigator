@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "name": "Diff Navigator",
   "version": "1.0",
-  "description": "Navigate through highlighted changes on any page",
-  "permissions": ["activeTab"],
+  "description": "Navigate through highlighted elements by class name",
+  "permissions": ["activeTab", "storage"],
   "browser_action": {
     "default_popup": "popup.html"
   },
